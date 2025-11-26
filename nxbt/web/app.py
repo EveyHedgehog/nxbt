@@ -1,11 +1,11 @@
 import json
 import os
-from threading import RLock
+from threading import RLock, Thread
 import time
 from socket import gethostname
 
 from .cert import generate_cert
-from ..nxbt import Nxbt, PRO_CONTROLLER
+from ..nxbt import Nxbt, PRO_CONTROLLER, JOYCON_L, JOYCON_R
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import eventlet
@@ -31,7 +31,7 @@ else:
 app.config['SECRET_KEY'] = secret_key
 
 # Starting socket server with Flask app
-sio = SocketIO(app, cookie=False)
+sio = SocketIO(app, cookie=False, cors_allowed_origins="*")
 
 user_info_lock = RLock()
 USER_INFO = {}
@@ -73,13 +73,19 @@ def on_shutdown(index):
     nxbt.remove_controller(index)
 
 
-@sio.on('web_create_pro_controller')
-def on_create_controller():
+@sio.on('web_create_controller')
+def on_create_controller(controller):
     print("Create Controller")
 
     try:
         reconnect_addresses = nxbt.get_switch_addresses()
-        index = nxbt.create_controller(PRO_CONTROLLER, reconnect_address=reconnect_addresses)
+        if controller == "JOYCON_L":
+            index = nxbt.create_controller(JOYCON_L, reconnect_address=reconnect_addresses)
+        elif controller == "JOYCON_R":
+            index = nxbt.create_controller(JOYCON_R, reconnect_address=reconnect_addresses)
+        else:
+            index = nxbt.create_controller(PRO_CONTROLLER, reconnect_address=reconnect_addresses)
+        
 
         with user_info_lock:
             USER_INFO[request.sid]["controller_index"] = index
@@ -100,11 +106,19 @@ def handle_input(message):
 
 @sio.on('macro')
 def handle_macro(message):
+    macro = Thread(target=start_macro, args=[message])
+    macro.start()
+    
+def start_macro(message):
+    print("Starting Macro...")
     message = json.loads(message)
     index = message[0]
     macro = message[1]
     nxbt.macro(index, macro)
-
+    
+@sio.on('stopmacro')
+def stop_macro():
+    nxbt.clear_all_macros()
 
 def start_web_app(ip='0.0.0.0', port=8000, usessl=False, cert_path=None):
     if usessl:

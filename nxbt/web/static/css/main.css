@@ -344,6 +344,15 @@ Controller Config Stying
     display: block;
     z-index: 2;
     position: relative;
+    margin: auto;
+}
+
+#joyconl-underlay{
+    width: 25%;
+}
+
+#joyconr-underlay{
+    width: 25%;
 }
 
 .controller-display {
@@ -372,6 +381,53 @@ Controller Config Stying
     width: 8% !important;
     padding-top: 8% !important;
 }
+
+
+/** Joy-Con (L) Control Indicator Positioning **/
+#jl_m {
+    left: 54.3%; 
+    top: 6.8%;  }
+#jl_s {
+    left: 46.6%; 
+    top: 20.8%; }
+#jl_u {
+    left: 46.3%; 
+    top: 40.8%;  }
+#jl_d {
+    left: 46.3%; 
+    top: 55.8%;  }
+#jl_l {
+    left: 41.7%; 
+    top: 48.8%;  }
+#jl_r {
+    left: 52.3%; 
+    top: 48.8%;  }
+#jl_c {
+    left: 50.3%;
+    top: 66.8%;  }
+
+/** Joy-Con (R) Control Indicator Positioning **/
+#jr_p {
+    left: 41.3%; 
+    top: 3.8%;  }
+#jr_s {
+    left: 48%; 
+    top: 47.8%;  }
+#jr_u {
+    left: 47.3%; 
+    top: 12%;  }
+#jr_d {
+    left: 47.3%; 
+    top: 27.8%;  }
+#jr_l {
+    left: 42.3%; 
+    top: 19.8%;  }
+#jr_r {
+    left: 53.3%; 
+    top: 19.8%;  }
+#jr_h {
+    left: 43.3%; 
+    top: 67.8%;  }
 
 /** Pro Controller Control Indicator Positioning **/
 #pc_ls {

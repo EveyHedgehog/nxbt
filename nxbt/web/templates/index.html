@@ -11,7 +11,7 @@
         <header class="top-bar">
             <div class="top-bar-wrapper">
                 <div>
-                    <h1>NXBT</h1><div class="mono">v0.1.4</div>
+                    <h1>NXBT</h1><div class="mono">v0.1.5</div>
                 </div>
                 <div id="status-indicator" class="hidden surface-lighter">
                     <div id="status-indicator-light" class="indicator-yellow"></div>
@@ -23,19 +23,19 @@
         <main>
             <section id="controller-selection">
                 <h1>Create a Controller</h1>
-                <div class="hidden surface controller-option" onclick="createJoyConL()">
+                <div class="surface controller-option" onclick="createController('JOYCON_L')">
                     <div class="controller-option-img-wrapper">
                         <img src="joyconl.svg" draggable="false">
                     </div>
                     Joy-Con (L)
                 </div>
-                <div class="surface controller-option" onclick="createProController()">
+                <div class="surface controller-option" onclick="createController('PRO_CONTROLLER')">
                     <div class="controller-option-img-wrapper">
                         <img src="procon.svg" draggable="false">
                     </div>
                     Pro Controller
                 </div>
-                <div class="hidden surface controller-option" onclick="createJoyConR()">
+                <div class="surface controller-option" onclick="createController('JOYCON_R')">
                     <div class="controller-option-img-wrapper">
                         <img src="joyconr.svg" draggable="false">
                     </div>
@@ -72,39 +72,51 @@
 
             <section id="controller-config" class="surface hidden">
                 <div id="controller-underlay-container">
-                    <div class="controller-display hidden">
-                        <div class="control-indicator" id="jl_"></div>
-                        <img id="joyconl-underlay" class="hidden controller-underlay" src="joyconl.svg" draggable="false">
+                    <div class="controller-display hidden" id="joyl">
+                        <div class="control-indicator square-button b_minus hidden" id="jl_m"></div>
+                        <div class="control-indicator" id="jl_s"></div>
+                        <div class="control-indicator b_up hidden" id="jl_u"></div>
+                        <div class="control-indicator b_down hidden" id="jl_d"></div>
+                        <div class="control-indicator b_left hidden" id="jl_l"></div>
+                        <div class="control-indicator b_right hidden" id="jl_r"></div>
+                        <div class="control-indicator square-button b_capture hidden" id="jl_c"></div>
+                        <img id="joyconl-underlay" class="controller-underlay" src="joyconl-transparent.svg" draggable="false">
                     </div>
-                    <div class="controller-display hidden">
-                        <div class="control-indicator" id="jr_"></div>
-                        <img id="joyconr-underlay" class="hidden controller-underlay" src="joyconr.svg" draggable="false">
+                    <div class="controller-display hidden" id="joyr">
+                        <div class="control-indicator square-button b_plus hidden" id="jr_p"></div>
+                        <div class="control-indicator" id="jr_s"></div>
+                        <div class="control-indicator b_x hidden" id="jr_u"></div>
+                        <div class="control-indicator b_b hidden" id="jr_d"></div>
+                        <div class="control-indicator b_y hidden" id="jr_l"></div>
+                        <div class="control-indicator b_a hidden" id="jr_r"></div>
+                        <div class="control-indicator b_home hidden" id="jr_h"></div>
+                        <img id="joyconr-underlay" class="controller-underlay" src="joyconr-transparent.svg" draggable="false">
                     </div>
-                    <div class="controller-display">
+                    <div class="controller-display hidden" id= "pro">
                         <img id="procon-underlay" class="controller-underlay" src="procon-transparent.svg" draggable="false">
                         <div class="control-indicator" id="pc_ls"></div>
                         <div class="control-indicator" id="pc_rs"></div>
 
-                        <div class="control-indicator square-button hidden" id="pc_du"></div>
-                        <div class="control-indicator square-button hidden" id="pc_dl"></div>
-                        <div class="control-indicator square-button hidden" id="pc_dr"></div>
-                        <div class="control-indicator square-button hidden" id="pc_dd"></div>
+                        <div class="control-indicator b_up square-button hidden" id="pc_du"></div>
+                        <div class="control-indicator b_left square-button hidden" id="pc_dl"></div>
+                        <div class="control-indicator b_right square-button hidden" id="pc_dr"></div>
+                        <div class="control-indicator b_down square-button hidden" id="pc_dd"></div>
 
-                        <div class="control-indicator hidden" id="pc_h"></div>
-                        <div class="control-indicator hidden" id="pc_c"></div>
+                        <div class="control-indicator b_home hidden" id="pc_h"></div>
+                        <div class="control-indicator b_capture hidden" id="pc_c"></div>
 
-                        <div class="control-indicator hidden" id="pc_m"></div>
-                        <div class="control-indicator hidden" id="pc_p"></div>
+                        <div class="control-indicator b_minus hidden" id="pc_m"></div>
+                        <div class="control-indicator b_plus hidden" id="pc_p"></div>
 
-                        <div class="control-indicator big-button hidden" id="pc_a"></div>
-                        <div class="control-indicator big-button hidden" id="pc_b"></div>
-                        <div class="control-indicator big-button hidden" id="pc_x"></div>
-                        <div class="control-indicator big-button hidden" id="pc_y"></div>
+                        <div class="control-indicator big-button b_a hidden" id="pc_a"></div>
+                        <div class="control-indicator big-button b_b hidden" id="pc_b"></div>
+                        <div class="control-indicator big-button b_x hidden" id="pc_x"></div>
+                        <div class="control-indicator big-button b_y hidden" id="pc_y"></div>
 
-                        <div class="control-indicator hidden" id="pc_l"></div>
-                        <div class="control-indicator hidden" id="pc_zl"></div>
-                        <div class="control-indicator hidden" id="pc_r"></div>
-                        <div class="control-indicator hidden" id="pc_zr"></div>
+                        <div class="control-indicator b_l hidden" id="pc_l"></div>
+                        <div class="control-indicator b_zl hidden" id="pc_zl"></div>
+                        <div class="control-indicator b_r hidden" id="pc_r"></div>
+                        <div class="control-indicator b_zr hidden" id="pc_zr"></div>
                     </div>
                 </div>
                 <div id="controller-input" class="controller-config-subsection">
@@ -162,7 +174,7 @@
                                     <td>[ & ]</td>
                                 </tr>
                                 <tr>
-                                    <td>Plus & Minus</td>
+                                    <td>Minus & Plus</td>
                                     <td>6 & 7</td>
                                 </tr>
                                 <tr>
@@ -196,7 +208,7 @@
                 <div id="controller-commands" class="controller-config-subsection">
                     <h2 class="surface-lighter">Controller Commands</h2>
                     <button onclick="shutdownController()">Shutdown Controller</button>
-                    <button onclick="recreateProController()">Recreate Controller</button>
+                    <button onclick="recreateController()">Recreate Controller</button>
                     <button onclick="restartController()">Restart Controller</button>
 
                     <h2 class="surface-lighter">Controller Macro</h2>
@@ -206,6 +218,7 @@
                     </p>
                     <textarea id="macro-text" class="mono" placeholder="Type Your Macro Here" onfocus="disableKeyHandlers()" onblur="enableKeyHandlers()"></textarea>
                     <button onclick="sendMacro()">Run Macro</button>
+                    <button onclick="stopMacro()">Stop Macro</button>
                 </div>
             </section>
 

@@ -12,6 +12,9 @@ let HTML_CONTROLLER_SELECTION = document.getElementById("controller-selection");
 let HTML_LOADER = document.getElementById("loader");
 let HTML_LOADER_TEXT = document.getElementById("loader-text");
 let HTML_CONTROLLER_CONFIG = document.getElementById("controller-config");
+let HTML_CONTROLLER_JOYL = document.getElementById("joyl");
+let HTML_CONTROLLER_JOYR = document.getElementById("joyr");
+let HTML_CONTROLLER_PRO = document.getElementById("pro");
 let HTML_MACRO_TEXT = document.getElementById("macro-text");
 let HTML_STATUS_INDICATOR = document.getElementById("status-indicator");
 let HTML_STATUS_INDICATOR_LIGHT = document.getElementById("status-indicator-light");
@@ -142,48 +145,51 @@ let INPUT_PACKET = {
 }
 let INPUT_PACKET_OLD = JSON.parse(JSON.stringify(INPUT_PACKET));
 
-let PRO_CONTROLLER_DISPLAY = {
+let CONTROLLER_DISPLAY = {
     // Sticks
     "L_STICK": {
         "STICK": true,
         "ELEMENT": document.getElementById("pc_ls"),
-        "MAX_X": 23,
-        "MIN_X": 15.5,
+        "JOY": document.getElementById("jl_s"),
+        "JOY_X": 42.85,
+        "X": 15.5,
         "DIFF_X": 7.5,
-        "MAX_Y": 29,
-        "MIN_Y": 18,
+        "Y": 29,
+        "JOY_Y": 26.3,
         "DIFF_Y": 11
     },
     "R_STICK": {
         "STICK": true,
         "ELEMENT": document.getElementById("pc_rs"),
-        "MAX_X": 63.5,
-        "MIN_X": 56,
+        "JOY": document.getElementById("jr_s"),
+        "JOY_X": 44.25,
+        "X":  56,
         "DIFF_X": 7.5,
-        "MAX_Y": 50,
-        "MIN_Y": 38.125,
+        "Y": 50,
+        "JOY_Y": 54.3,
         "DIFF_Y": 11.875,
     },
     // Dpad
-    "DPAD_UP": document.getElementById("pc_du"),
-    "DPAD_LEFT": document.getElementById("pc_dl"),
-    "DPAD_RIGHT": document.getElementById("pc_dr"),
-    "DPAD_DOWN": document.getElementById("pc_dd"),
+    "DPAD_UP": document.querySelectorAll(".b_up"),
+    "DPAD_LEFT": document.querySelectorAll(".b_left"),
+    "DPAD_RIGHT": document.querySelectorAll(".b_right"),
+    "DPAD_DOWN": document.querySelectorAll(".b_down"),
+    
     // Triggers
-    "L": document.getElementById("pc_l"),
-    "ZL": document.getElementById("pc_zl"),
-    "R": document.getElementById("pc_r"),
-    "ZR": document.getElementById("pc_zr"),
+    "L": document.querySelectorAll(".b_l"),
+    "ZL": document.querySelectorAll(".b_zl"),
+    "R": document.querySelectorAll(".b_r"),
+    "ZR": document.querySelectorAll(".b_zr"),
     // Meta buttons
-    "PLUS": document.getElementById("pc_p"),
-    "MINUS": document.getElementById("pc_m"),
-    "HOME": document.getElementById("pc_h"),
-    "CAPTURE": document.getElementById("pc_c"),
+    "PLUS": document.querySelectorAll(".b_plus"),
+    "MINUS": document.querySelectorAll(".b_minus"),
+    "HOME": document.querySelectorAll(".b_home"),
+    "CAPTURE": document.querySelectorAll(".b_capture"),
     // Buttons
-    "Y": document.getElementById("pc_y"),
-    "X": document.getElementById("pc_x"),
-    "B": document.getElementById("pc_b"),
-    "A": document.getElementById("pc_a")
+    "Y": document.querySelectorAll(".b_y"),
+    "X": document.querySelectorAll(".b_x"),
+    "B": document.querySelectorAll(".b_b"),
+    "A": document.querySelectorAll(".b_a")
 }
 
 /**********************************************/
@@ -191,6 +197,8 @@ let PRO_CONTROLLER_DISPLAY = {
 /**********************************************/
 
 let socket = io();
+
+// let socket = io("*", {});
 
 // Request to the state at 1Hz
 socket.emit('state');
@@ -377,11 +385,19 @@ function displayError(errorText) {
     }, 10000);
 }
 
-function createProController() {
+function createController(controller) {
     HTML_CONTROLLER_SELECTION.classList.add('hidden');
     HTML_LOADER.classList.remove('hidden');
+    
+    if (controller == "JOYCON_L") {
+        HTML_CONTROLLER_JOYL.classList.remove('hidden');
+    } else if (controller == "JOYCON_R"){
+        HTML_CONTROLLER_JOYR.classList.remove('hidden');
+    } else {
+        HTML_CONTROLLER_PRO.classList.remove('hidden');
+    }
 
-    socket.emit('web_create_pro_controller');
+    socket.emit('web_create_controller', controller);
 }
 
 function shutdownController() {
@@ -390,8 +406,14 @@ function shutdownController() {
     }
 }
 
+
 function recreateProController() {
     socket.emit('create_pro_controller');
+}
+
+function recreateController() {
+    shutdownController();
+    window.location.reload();
 }
 
 function restartController() {
@@ -544,7 +566,7 @@ function updateGamepadDisplay() {
     controls = Object.keys(INPUT_PACKET);
     for (let i = 0; i < controls.length; i++) {
         controlState = INPUT_PACKET[controls[i]];
-        control = PRO_CONTROLLER_DISPLAY[controls[i]];
+        control = CONTROLLER_DISPLAY[controls[i]];
 
         if (!control) {
             continue;
@@ -553,16 +575,26 @@ function updateGamepadDisplay() {
         if (control.STICK) {
             xRatio = (controlState["X_VALUE"] + 100)/200;
             yRatio = (controlState["Y_VALUE"] + 100)/200;
-            xPos = control["MIN_X"] + (xRatio * control["DIFF_X"]);
-            yPos = control["MAX_Y"] - (yRatio * control["DIFF_Y"]);
+            xPos = control["X"] + (xRatio * control["DIFF_X"]);
+            yPos = control["Y"] - (yRatio * control["DIFF_Y"]);
             control["ELEMENT"].style.left = xPos + "%";
             control["ELEMENT"].style.top = yPos + "%";
-        } else {
+            
+            joyXPos = control["JOY_X"] + (xRatio * control["DIFF_X"]);
+            joyYPos = control["JOY_Y"] - (yRatio * control["DIFF_Y"]);
+            control["JOY"].style.left = joyXPos + "%";
+            control["JOY"].style.top = joyYPos + "%";
+        } else{
             if (controlState) {
-                control.classList.remove('hidden');
+                control.forEach(div => {
+                    div.classList.remove('hidden');
+                });
             } else {
-                control.classList.add('hidden');
+                control.forEach(div => {
+                    div.classList.add('hidden');
+                });
             }
+            
         }
     }
 }
@@ -575,37 +607,37 @@ function eventLoop() {
     // pressed buttons if we're using a keyboard
     if (INPUT_DEVICE == InputDevice.KEYBOARD) {
         // Calculating left x/y stick values
-        lXValue = 0
-        lYValue = 0
+        lXValue = 0;
+        lYValue = 0;
         if (INPUT_PACKET["L_STICK"]["LS_LEFT"]) {
-            lXValue -= 100
+            lXValue -= 100;
         }
         if (INPUT_PACKET["L_STICK"]["LS_RIGHT"]) {
-            lXValue += 100
+            lXValue += 100;
         }
         if (INPUT_PACKET["L_STICK"]["LS_UP"]) {
-            lYValue += 100
+            lYValue += 100;
         }
         if (INPUT_PACKET["L_STICK"]["LS_DOWN"]) {
-            lYValue -= 100
+            lYValue -= 100;
         }
         INPUT_PACKET["L_STICK"]["X_VALUE"] = lXValue
         INPUT_PACKET["L_STICK"]["Y_VALUE"] = lYValue
 
         // Calculating left x/y stick values
-        rXValue = 0
-        rYValue = 0
+        rXValue = 0;
+        rYValue = 0;
         if (INPUT_PACKET["R_STICK"]["RS_LEFT"]) {
-            rXValue -= 100
+            rXValue -= 100;
         }
         if (INPUT_PACKET["R_STICK"]["RS_RIGHT"]) {
-            rXValue += 100
+            rXValue += 100;
         }
         if (INPUT_PACKET["R_STICK"]["RS_UP"]) {
-            rYValue += 100
+            rYValue += 100;
         }
         if (INPUT_PACKET["R_STICK"]["RS_DOWN"]) {
-            rYValue -= 100
+            rYValue -= 100;
         }
         INPUT_PACKET["R_STICK"]["X_VALUE"] = rXValue
         INPUT_PACKET["R_STICK"]["Y_VALUE"] = rYValue
@@ -647,6 +679,10 @@ function sendMacro() {
     socket.emit('macro', JSON.stringify([NXBT_CONTROLLER_INDEX, macro]));
 }
 
+function stopMacro(){
+    socket.emit('stopmacro');
+}
+
 /**********************************************/
 /* Debug Functionality */
 /**********************************************/
@@ -680,7 +716,7 @@ const measureTimeoutLatency = {
 
         context.deltaSum += Math.abs(delta);
         context.diffSum += Math.abs(diff);
-        context.count += 1
+        context.count += 1;
 
         if (context.count >= context.maxCount) {
             avgDelta = context.deltaSum/context.count;

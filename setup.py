@@ -16,10 +16,5 @@ setup(
         "jinja2==3.0.3",
         "itsdangerous==2.0.1",
         "Werkzeug==2.0.3",
-    ],
-    extra_require={
-        "dev": [
-            "pytest"
-        ]
-    }
+    ]
 )
