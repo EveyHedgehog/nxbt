@@ -4,7 +4,7 @@ from time import perf_counter
 
 from .controller import ControllerTypes
 from .utils import replace_subarray
-
+import sys
 
 class SwitchResponses(Enum):
 
@@ -43,7 +43,7 @@ class ControllerProtocol():
     VIBRATOR_BYTES = [0xA0, 0xB0, 0xC0, 0x90]
 
     def __init__(self, controller_type, bt_address, report_size=50,
-                 colour_body=None, colour_buttons=None):
+                 colour_body=None, colour_buttons=None, colour_grips=None):
         """Initializes the protocol for the controller.
 
         :param controller_type: The type of controller (Joy-Con (L),
@@ -59,6 +59,10 @@ class ControllerProtocol():
         :param colour_buttons: Sets the colour of the controller buttons,
         defaults to None
         :type colour_buttons: list of bytes, optional
+        :param colour_grips: The colour of the Pro Controller's grips
+        represented by a hexadecimal colour value (a list of
+        six ints (0-255)), defaults to None
+        :type colour_grips: list, optional
         :raises ValueError: On unknown controller type
         """
 
@@ -127,6 +131,10 @@ class ControllerProtocol():
             self.colour_buttons = [0x0F] * 3
         else:
             self.colour_buttons = colour_buttons
+        if not colour_grips:
+            self.colour_grips = [0x0F] * 7
+        else:
+            self.colour_grips = colour_grips
 
     def get_report(self):
 
@@ -325,8 +333,8 @@ class ControllerProtocol():
         # Unknown byte, always 1
         self.report[26] = 0x01
 
-        # Controller colours location (read from SPI)
-        self.report[27] = 0x01
+        # Controller colours location (read from SPI), when set to 0x02 it allows for custom grip colours for Pro Controller
+        self.report[27] = 0x02
 
     def set_shipment(self):
 
@@ -361,7 +369,9 @@ class ControllerProtocol():
         replace_subarray(self.report, 14, 49, replace_arr=imu_data)
 
     def spi_read(self, message):
-
+        
+        print(self.report, file=sys.stdout)
+        
         addr_top = message.subcommand[2]
         addr_bottom = message.subcommand[1]
         read_length = message.subcommand[5]
@@ -408,7 +418,8 @@ class ControllerProtocol():
                 self.report, 24, 3,
                 replace_arr=self.colour_buttons)
             # Left/right grip colours (Pro controller)
-            replace_subarray(self.report, 27, 7, 0xFF)
+            replace_subarray(self.report, 27, 6, 
+                replace_arr=self.colour_grips)
 
         # Factory sensor/stick device parameters
         elif addr_top == 0x60 and addr_bottom == 0x80:

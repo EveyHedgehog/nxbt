@@ -74,17 +74,17 @@ def on_shutdown(index):
 
 
 @sio.on('web_create_controller')
-def on_create_controller(controller):
+def on_create_controller(controller, leftcolour, rightcolour, gripcolour, bodycolour, buttoncolour):
     print("Create Controller")
 
     try:
         reconnect_addresses = nxbt.get_switch_addresses()
         if controller == "JOYCON_L":
-            index = nxbt.create_controller(JOYCON_L, reconnect_address=reconnect_addresses)
+            index = nxbt.create_controller(JOYCON_L, reconnect_address=reconnect_addresses, colour_body=leftcolour, colour_buttons=buttoncolour)
         elif controller == "JOYCON_R":
-            index = nxbt.create_controller(JOYCON_R, reconnect_address=reconnect_addresses)
+            index = nxbt.create_controller(JOYCON_R, reconnect_address=reconnect_addresses, colour_body=rightcolour, colour_buttons=buttoncolour)
         else:
-            index = nxbt.create_controller(PRO_CONTROLLER, reconnect_address=reconnect_addresses)
+            index = nxbt.create_controller(PRO_CONTROLLER, reconnect_address=reconnect_addresses, colour_body=bodycolour, colour_grips=gripcolour, colour_buttons=buttoncolour)
         
 
         with user_info_lock:

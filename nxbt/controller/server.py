@@ -20,7 +20,7 @@ class ControllerServer():
 
     def __init__(self, controller_type, adapter_path="/org/bluez/hci0",
                  state=None, task_queue=None, lock=None, colour_body=None,
-                 colour_buttons=None):
+                 colour_buttons=None, colour_grips=None):
 
         self.logger = logging.getLogger('nxbt')
         # Cache logging level to increase performance on checks
@@ -43,6 +43,7 @@ class ControllerServer():
         self.controller_type = controller_type
         self.colour_body = colour_body
         self.colour_buttons = colour_buttons
+        self.colour_grips = colour_grips
 
         if lock:
             self.lock = lock
@@ -57,7 +58,8 @@ class ControllerServer():
             self.controller_type,
             self.bt.address,
             colour_body=self.colour_body,
-            colour_buttons=self.colour_buttons)
+            colour_buttons=self.colour_buttons,
+            colour_grips=self.colour_grips)
 
         self.input = InputParser(self.protocol)
 
@@ -206,7 +208,8 @@ class ControllerServer():
                     self.controller_type,
                     self.bt.address,
                     colour_body=self.colour_body,
-                    colour_buttons=self.colour_buttons)
+                    colour_buttons=self.colour_buttons,
+                    colour_grips=self.colour_grips)
                 self.input.reassign_protocol(self.protocol)
                 if self.lock:
                     self.lock.acquire()
@@ -273,7 +276,8 @@ class ControllerServer():
             self.controller_type,
             self.bt.address,
             colour_body=self.colour_body,
-            colour_buttons=self.colour_buttons)
+            colour_buttons=self.colour_buttons,
+            colour_grips=self.colour_grips)
         self.input.reassign_protocol(self.protocol)
 
         # Since we were forced to attempt a reconnection

@@ -244,6 +244,7 @@ class Nxbt():
                             msg["arguments"]["adapter_path"],
                             msg["arguments"]["colour_body"],
                             msg["arguments"]["colour_buttons"],
+                            msg["arguments"]["colour_grips"],
                             msg["arguments"]["reconnect_address"])
                     elif msg["command"] == NxbtCommands.INPUT_MACRO:
                         cm.input_macro(
@@ -499,7 +500,7 @@ class Nxbt():
 
     def create_controller(self, controller_type, adapter_path=None,
                           colour_body=None, colour_buttons=None,
-                          reconnect_address=None):
+                          colour_grips=None, reconnect_address=None):
         """Used to create a Nintendo Switch controller of a
         given type and colour on an (optionally) specified
         bluetooth adapter.
@@ -526,6 +527,10 @@ class Nxbt():
         represented by a hexadecimal colour value (a list of
         three ints (0-255)), defaults to None
         :type colour_buttons: list, optional
+        :param colour_grips: The colour of the Pro Controller's grips
+        represented by a hexadecimal colour value (a list of
+        six ints (0-255)), defaults to None
+        :type colour_grips: list, optional
         :param reconnect_address: A previously connected to
         Switch's Bluetooth MAC address, defaults to None
         :type reconnect_address: str or list, optional
@@ -561,6 +566,7 @@ class Nxbt():
                     "adapter_path": adapter_path,
                     "colour_body": colour_body,
                     "colour_buttons": colour_buttons,
+                    "colour_grips": colour_grips,
                     "reconnect_address": reconnect_address,
                 }
             })
@@ -629,7 +635,7 @@ class Nxbt():
 
         while not self.state[controller_index]["state"] == "connected":
             if self.state[controller_index]["state"] == "crashed":
-                raise OSError("The watched controller has crashe with error",
+                raise OSError("The watched controller has crashed with error",
                               self.state[controller_index]["errors"])
             pass
 
@@ -709,7 +715,7 @@ class _ControllerManager():
 
     def create_controller(self, index, controller_type, adapter_path,
                           colour_body=None, colour_buttons=None,
-                          reconnect_address=None):
+                          colour_grips=None, reconnect_address=None):
         """Instantiates a given controller as a multiprocessing
         Process with a shared state dict and a task queue.
 
@@ -728,6 +734,10 @@ class _ControllerManager():
         :param colour_buttons: A list of three ints representing the
         hex colour of the controller, defaults to None
         :type colour_buttons: list, optional
+        :param colour_grips: The colour of the Pro Controller's grips
+        represented by a hexadecimal colour value (a list of
+        six ints (0-255)), defaults to None
+        :type colour_grips: list, optional
         :param reconnect_address: The address of a Nintendo Switch
         to reconnect to, defaults to None
         :type reconnect_address: str, optional
@@ -742,6 +752,7 @@ class _ControllerManager():
         controller_state["direct_input"] = json.loads(json.dumps(DIRECT_INPUT_PACKET))
         controller_state["colour_body"] = colour_body
         controller_state["colour_buttons"] = colour_buttons
+        controller_state["colour_grips"] = colour_grips
         controller_state["type"] = str(controller_type)
         controller_state["adapter_path"] = adapter_path
         controller_state["last_connection"] = None
@@ -756,7 +767,8 @@ class _ControllerManager():
                                   state=controller_state,
                                   task_queue=controller_queue,
                                   colour_body=colour_body,
-                                  colour_buttons=colour_buttons)
+                                  colour_buttons=colour_buttons,
+                                  colour_grips=colour_grips)
         controller = Process(target=server.run, args=(reconnect_address,))
         controller.daemon = True
         self._children[index] = controller

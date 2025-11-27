@@ -24,6 +24,15 @@ let HTML_CONTROLLER_MAP = document.getElementById("controller-map");
 let HTML_ERROR_DISPLAY = document.getElementById("error-display");
 let HTML_CONTROLLER_SESSIONS = document.getElementById("controller-sessions");
 let HTML_CONTROLLER_SESSIONS_CONTAINER = document.getElementById("controller-session-container");
+let HTML_CONTROLLER_COLOUR = document.getElementById("controller-color");
+let HTML_CONTROLLER_COLOUR_PICKER_LEFT = document.getElementById("colour_left");
+let HTML_CONTROLLER_COLOUR_PICKER_RIGHT = document.getElementById("colour_right");
+let HTML_CONTROLLER_COLOUR_PICKER_BODY = document.getElementById("colour_body");
+let HTML_CONTROLLER_COLOUR_PICKER_BUTTON = document.getElementById("colour_button");
+let HTML_CONTROLLER_COLOUR_SVG_LEFT = document.getElementsByClassName("c_left");
+let HTML_CONTROLLER_COLOUR_SVG_RIGHT = document.getElementsByClassName("c_right");
+let HTML_CONTROLLER_COLOUR_SVG_BODY = document.getElementsByClassName("c_body");
+let HTML_CONTROLLER_COLOUR_BUTTON = document.getElementsByClassName("control-indicator");
 
 const ControllerState = {
     INITIALIZING: "initializing",
@@ -385,10 +394,39 @@ function displayError(errorText) {
     }, 10000);
 }
 
+function hexToRgb(hex) {
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+    var rgb = [];
+    rgb.push(r,g,b);
+
+    return rgb;
+}
+
 function createController(controller) {
     HTML_CONTROLLER_SELECTION.classList.add('hidden');
     HTML_LOADER.classList.remove('hidden');
-    
+    HTML_CONTROLLER_COLOUR.classList.add('hidden');
+    leftColour = HTML_CONTROLLER_COLOUR_PICKER_LEFT.value;
+    rightColour = HTML_CONTROLLER_COLOUR_PICKER_RIGHT.value;
+    bodyColour = HTML_CONTROLLER_COLOUR_PICKER_BODY.value;
+    buttonColour = HTML_CONTROLLER_COLOUR_PICKER_BUTTON.value;
+ 
+    for (let l = 0; l < HTML_CONTROLLER_COLOUR_SVG_LEFT.length; l++) {
+        HTML_CONTROLLER_COLOUR_SVG_LEFT[l].style["fill"] = leftColour;
+    }
+    for (let r = 0; r < HTML_CONTROLLER_COLOUR_SVG_RIGHT.length; r++) {
+        HTML_CONTROLLER_COLOUR_SVG_RIGHT[r].style["fill"] = rightColour;
+    }
+    for (let b = 0; b < HTML_CONTROLLER_COLOUR_SVG_BODY.length; b++) {
+        HTML_CONTROLLER_COLOUR_SVG_BODY[b].style["fill"] = bodyColour;
+    }
+    for (let u = 0; u < HTML_CONTROLLER_COLOUR_BUTTON.length; u++) {
+        HTML_CONTROLLER_COLOUR_BUTTON[u].style["background-color"] = buttonColour;
+    }
+ 
     if (controller == "JOYCON_L") {
         HTML_CONTROLLER_JOYL.classList.remove('hidden');
     } else if (controller == "JOYCON_R"){
@@ -396,8 +434,21 @@ function createController(controller) {
     } else {
         HTML_CONTROLLER_PRO.classList.remove('hidden');
     }
+    
+    leftRgb = hexToRgb(leftColour.replace(/^#/, ''));
+    rightRgb = hexToRgb(rightColour.replace(/^#/, ''));
+    bodyRgb = hexToRgb(bodyColour.replace(/^#/, ''));
+    buttonRgb = hexToRgb(buttonColour.replace(/^#/, ''));
+    
+    gripRgb = [];
+    leftRgb.forEach(function (item, index) {
+        gripRgb.push(item);
+    });
+    rightRgb.forEach(function (item, index) {
+        gripRgb.push(item);
+    });
 
-    socket.emit('web_create_controller', controller);
+    socket.emit('web_create_controller', controller, leftRgb, rightRgb, gripRgb, bodyRgb, buttonRgb);
 }
 
 function shutdownController() {

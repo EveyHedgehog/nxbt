@@ -4,7 +4,7 @@
         <title>NXBT Webapp</title>
         <link rel="icon" type="image/png" href="favicon.png"/>
         <link rel="stylesheet" type="text/css" href="css/main.css">
-
+        <script src="js/svg-inject.min.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
@@ -40,6 +40,29 @@
                         <img src="joyconr.svg" draggable="false">
                     </div>
                     Joy-Con (R)
+                </div>
+            </section>
+            
+            <section id="controller-color" class="surface">
+                <h1>Controller Colors</h1>
+                <div id="controller-color-container">
+                    <label>
+                    <input type="color" value="#dadada" id="colour_left"/>
+                    <span>Left</span>
+                    </label>
+                    <label>
+                    <input type="color" value="#dadada" id="colour_right"/>
+                    <span>Right</span>
+                    </label>
+                    <label>
+                    <input type="color" value="#1a1f28" id="colour_body"/>
+                    <span>Body</span>
+                    </label>
+                    <label>
+                    <input type="color" value="#2c3544" id="colour_button"/>
+                    <span>Buttons</span>
+                    </label>
+                </div>
                 </div>
             </section>
 
@@ -80,7 +103,7 @@
                         <div class="control-indicator b_left hidden" id="jl_l"></div>
                         <div class="control-indicator b_right hidden" id="jl_r"></div>
                         <div class="control-indicator square-button b_capture hidden" id="jl_c"></div>
-                        <img id="joyconl-underlay" class="controller-underlay" src="joyconl-transparent.svg" draggable="false">
+                        <img id="joyconl-underlay" class="controller-underlay" src="joyconl-transparent.svg" onload="SVGInject(this)" draggable="false">
                     </div>
                     <div class="controller-display hidden" id="joyr">
                         <div class="control-indicator square-button b_plus hidden" id="jr_p"></div>
@@ -90,10 +113,10 @@
                         <div class="control-indicator b_y hidden" id="jr_l"></div>
                         <div class="control-indicator b_a hidden" id="jr_r"></div>
                         <div class="control-indicator b_home hidden" id="jr_h"></div>
-                        <img id="joyconr-underlay" class="controller-underlay" src="joyconr-transparent.svg" draggable="false">
+                        <img id="joyconr-underlay" class="controller-underlay" src="joyconr-transparent.svg" onload="SVGInject(this)" draggable="false">
                     </div>
                     <div class="controller-display hidden" id= "pro">
-                        <img id="procon-underlay" class="controller-underlay" src="procon-transparent.svg" draggable="false">
+                        <img id="procon-underlay" class="controller-underlay" src="procon-transparent.svg" onload="SVGInject(this)" draggable="false">
                         <div class="control-indicator" id="pc_ls"></div>
                         <div class="control-indicator" id="pc_rs"></div>
 
