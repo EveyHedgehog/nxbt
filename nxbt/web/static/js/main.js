@@ -11,17 +11,24 @@ let STATE = false;
 let HTML_CONTROLLER_SELECTION = document.getElementById("controller-selection");
 let HTML_LOADER = document.getElementById("loader");
 let HTML_LOADER_TEXT = document.getElementById("loader-text");
+let HTML_SETTINGS_CONTAINER = document.getElementById("settings-container");
+let HTML_SETTINGS_COLOUR_PICKER_BG = document.getElementById("colour_bg");
+let HTML_SETTINGS_COLOUR_PICKER_MAIN = document.getElementById("colour_main");
+let HTML_SETTINGS_COLOUR_PICKER_SECONDARY = document.getElementById("colour_secondary");
+let HTML_SETTINGS_COLOUR_PICKER_TEXT = document.getElementById("colour_text");
 let HTML_CONTROLLER_CONFIG = document.getElementById("controller-config");
 let HTML_CONTROLLER_JOYL = document.getElementById("joyl");
 let HTML_CONTROLLER_JOYR = document.getElementById("joyr");
 let HTML_CONTROLLER_PRO = document.getElementById("pro");
 let HTML_MACRO_TEXT = document.getElementById("macro-text");
+let HTML_SEND_MACRO_BUTTON = document.getElementById("send-macro");
 let HTML_STATUS_INDICATOR = document.getElementById("status-indicator");
 let HTML_STATUS_INDICATOR_LIGHT = document.getElementById("status-indicator-light");
 let HTML_STATUS_INDICATOR_TEXT = document.getElementById("status-indicator-text");
 let HTML_KEYBOARD_MAP = document.getElementById("keyboard-map");
 let HTML_CONTROLLER_MAP = document.getElementById("controller-map");
 let HTML_ERROR_DISPLAY = document.getElementById("error-display");
+let HTML_MESSAGE_DISPLAY = document.getElementById("message");
 let HTML_CONTROLLER_SESSIONS = document.getElementById("controller-sessions");
 let HTML_CONTROLLER_SESSIONS_CONTAINER = document.getElementById("controller-session-container");
 let HTML_CONTROLLER_COLOUR = document.getElementById("controller-color");
@@ -233,6 +240,11 @@ socket.on('error', function(errorMessage) {
     displayError(errorMessage);
 });
 
+socket.on('macro_finished', function() {
+    HTML_SEND_MACRO_BUTTON.disabled = false;
+    HTML_MESSAGE_DISPLAY.classList.add("hidden");
+});
+
 /**********************************************/
 /* Listeners and Startup Functionality */
 /**********************************************/
@@ -242,8 +254,21 @@ window.onload = function() {
     // Run the Loader animation
     setInterval(updateLoader, 85);
     // // Print out the latency of setTimeout
-    // measureTimeoutLatency.start(120, 60);
+    // measureTimeoutLatency.start(120, 60);    
 }
+
+HTML_SETTINGS_COLOUR_PICKER_BG.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--bg-color', HTML_SETTINGS_COLOUR_PICKER_BG.value)
+})
+HTML_SETTINGS_COLOUR_PICKER_MAIN.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--main-color', HTML_SETTINGS_COLOUR_PICKER_MAIN.value)
+})
+HTML_SETTINGS_COLOUR_PICKER_SECONDARY.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--secondary-color', HTML_SETTINGS_COLOUR_PICKER_SECONDARY.value)
+})
+HTML_SETTINGS_COLOUR_PICKER_TEXT.addEventListener('input', e => {
+    document.documentElement.style.setProperty('--text-color', HTML_SETTINGS_COLOUR_PICKER_TEXT.value)
+})
 
 // Keydown listener
 function globalKeydownHandler(evt) {
@@ -331,6 +356,14 @@ window.addEventListener("gamepaddisconnected", function(evt) {
 /**********************************************/
 /* UI, Input Monitoring, Gamepad Functionality */
 /**********************************************/
+
+function openSettings(){
+    HTML_SETTINGS_CONTAINER.classList.remove("hidden");
+}
+
+function closeSettings(){
+    HTML_SETTINGS_CONTAINER.classList.add("hidden");
+}
 
 function displayOtherSessions() {
     controllerIndices = Object.keys(STATE);
@@ -456,7 +489,6 @@ function shutdownController() {
         socket.emit('shutdown', NXBT_CONTROLLER_INDEX);
     }
 }
-
 
 function recreateProController() {
     socket.emit('create_pro_controller');
@@ -727,11 +759,21 @@ function eventLoop() {
 
 function sendMacro() {
     let macro = HTML_MACRO_TEXT.value.toUpperCase();
+    HTML_SEND_MACRO_BUTTON.disabled = true;
+    HTML_MESSAGE_DISPLAY.classList.remove("hidden");
+    HTML_MESSAGE_DISPLAY.innerHTML = "<h1>A macro is running!</h1>";
     socket.emit('macro', JSON.stringify([NXBT_CONTROLLER_INDEX, macro]));
+    setInterval(checkForRunningMacro, 100);
 }
 
 function stopMacro(){
-    socket.emit('stopmacro');
+    HTML_SEND_MACRO_BUTTON.disabled = false;
+    HTML_MESSAGE_DISPLAY.classList.add("hidden");
+    socket.emit('stop_macro', NXBT_CONTROLLER_INDEX);
+}
+
+function checkForRunningMacro(){
+    socket.emit('check_macro', NXBT_CONTROLLER_INDEX);
 }
 
 /**********************************************/

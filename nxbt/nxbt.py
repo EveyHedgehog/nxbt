@@ -123,7 +123,6 @@ class NxbtCommands(Enum):
     REMOVE_CONTROLLER = 5
     QUIT = 6
 
-
 class Nxbt():
     """The nxbt object implements the core multiprocessing logic
     and message passing API that acts as the central of the application.
@@ -434,6 +433,20 @@ class Nxbt():
                     break
 
                 time.sleep(1/120)
+                
+    def get_current_macro(self, controller_index):
+        """Gets the ID of the running macro on a specified
+        controller.
+
+        :param controller_index: The index of a given controller
+        :type controller_index: int
+        :raises ValueError: If the controller_index does not exist
+        """
+
+        if controller_index not in self.manager_state.keys():
+            raise ValueError("Specified controller does not exist")
+
+        return self.manager_state[controller_index]["current_macro"]
 
     def clear_macros(self, controller_index):
         """Clears all running and queued macros on a specified
@@ -747,6 +760,7 @@ class _ControllerManager():
 
         controller_state = self.controller_resources.dict()
         controller_state["state"] = "initializing"
+        controller_state["current_macro"] = []
         controller_state["finished_macros"] = []
         controller_state["errors"] = False
         controller_state["direct_input"] = json.loads(json.dumps(DIRECT_INPUT_PACKET))

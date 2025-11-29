@@ -35,7 +35,7 @@ sio = SocketIO(app, cookie=False, cors_allowed_origins="*")
 
 user_info_lock = RLock()
 USER_INFO = {}
-
+run_macro = None
 
 @app.route('/')
 def index():
@@ -106,19 +106,23 @@ def handle_input(message):
 
 @sio.on('macro')
 def handle_macro(message):
-    macro = Thread(target=start_macro, args=[message])
-    macro.start()
-    
-def start_macro(message):
-    print("Starting Macro...")
     message = json.loads(message)
     index = message[0]
     macro = message[1]
-    nxbt.macro(index, macro)
     
-@sio.on('stopmacro')
-def stop_macro():
-    nxbt.clear_all_macros()
+    global run_macro
+    run_macro = nxbt.macro(index, macro, block=False)
+
+@sio.on('check_macro')
+def check_macro(controller):
+    finished = (nxbt.manager_state[controller]["finished_macros"])
+    if run_macro is not None:
+        if run_macro in finished:
+            emit('macro_finished')
+        
+@sio.on('stop_macro')
+def stop_macro(controller):
+    nxbt.clear_macros(controller)
 
 def start_web_app(ip='0.0.0.0', port=8000, usessl=False, cert_path=None):
     if usessl:

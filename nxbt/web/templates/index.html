@@ -13,6 +13,7 @@
                 <div>
                     <h1>NXBT</h1><div class="mono">v0.1.5</div>
                 </div>
+                <button id="settings-button" onclick="openSettings()">Settings</button>
                 <div id="status-indicator" class="hidden surface-lighter">
                     <div id="status-indicator-light" class="indicator-yellow"></div>
                     <span id="status-indicator-text">Loading</span>
@@ -21,6 +22,16 @@
         </header>
 
         <main>
+            <section id="settings-container" class="hidden">
+                <div class="surface" id="settings-box">
+                    <h2 class="surface-lighter">Theming</h2>
+                    <input type="color" value="#1a1f28" id="colour_bg">
+                    <input type="color" value="#2c3544" id="colour_main">
+                    <input type="color" value="#3a4759" id="colour_secondary">
+                    <input type="color" value="#d9dada" id="colour_text">
+                    <button id="settings-cancel" onclick="closeSettings()">Cancel</button>
+                </div>
+            </section>
             <section id="controller-selection">
                 <h1>Create a Controller</h1>
                 <div class="surface controller-option" onclick="createController('JOYCON_L')">
@@ -240,8 +251,8 @@
                         macro.
                     </p>
                     <textarea id="macro-text" class="mono" placeholder="Type Your Macro Here" onfocus="disableKeyHandlers()" onblur="enableKeyHandlers()"></textarea>
-                    <button onclick="sendMacro()">Run Macro</button>
-                    <button onclick="stopMacro()">Stop Macro</button>
+                    <button id="send-macro" onclick="sendMacro()">Run Macro</button>
+                    <button id="stop-macro" onclick="stopMacro()">Stop Macro</button>
                 </div>
             </section>
 
@@ -250,7 +261,9 @@
                 <div id="controller-session-container"></div>
             </section>
 
-            <section id="error-display"></section>
+            <section id="error-display">
+                <div id="message" class="hidden"></div>
+            </section>
 
             <footer>
                 <p>Source Code and Documentation Available <a href="https://github.com/Brikwerk/nxbt" target="_blank">Here</a></p>

@@ -135,7 +135,7 @@ class InputParser():
             state["finished_macros"] = finished
 
         return
-
+    
     def clear_macros(self):
 
         self.current_macro = None
